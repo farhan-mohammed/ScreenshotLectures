@@ -23,17 +23,24 @@ I ran this script on this Organic Chemistry Tutor Video. The screenshots of this
 It's pretty simple. Using OpenCV, I looped through the frames in the video and comapred the current frame to previous frame and if its 'significantly' different I save the frame as an image.
 
 # How to Setup
-
 ```bash
-$ source ScreenshotLectures/bin/activate
-$
+$ python3 -m pip install -r requirements.txt
 ```
 
 For a test run on the Determinants Video
 
+```bash
+$ python3 index.py Testing/DeterminantVideo.mp4
 ```
-python index.py Testing/DeterminantVideo.mp4
+
+To generate a pdf of the images
+
+```bash
+$ python3 Screenshots2PDF.py Testing/DeterminantVideo_Frames
 ```
+
+Look at the Testing folder for results.
+
 
 # How to Run
 

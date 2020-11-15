@@ -19,7 +19,7 @@ def mse(imageA, imageB):
     # the 'Mean Squared Error' between the two images is the
     # sum of the squared difference between the two images;
     # NOTE: the two images must have the same dimension
-    y, x, z = imageA.shape
+    _, x, _ = imageA.shape
     x = int(x*0.835)
     # y = y*0.8
     # I had an issue where the speaker on the zoom video flicked a lot, causing the repetition of frames. To tackle this, I only take the MSE of the cropped image, which should ignore the zoom video.
@@ -32,18 +32,17 @@ def mse(imageA, imageB):
     return err
 
 
-def testRun(vidcap, frames_folder, success, image):
+def predictTreshold(vidcap, frames_folder, success, image):
     # Logsitics
     fps = int(vidcap.get(cv2.CAP_PROP_FPS))
     totalNoFrames = int(vidcap.get(cv2.CAP_PROP_FRAME_COUNT))
     durationInSeconds = float(totalNoFrames) / float(fps)
-    print('----Logistics----')
-    print("FPS:", fps)
-    print("Total Frames:", int(totalNoFrames))
-    print("Length of Video", str(datetime.timedelta(seconds=durationInSeconds)))
-    print('---Doing a Dry run for Treshold----')
+    print('-'*20+' Logistics ' + '-'*20)
+    print("FPS: "+str(fps))
+    print("Total Frames: "+str(int(totalNoFrames)))
+    print("Length of Video: " + str(datetime.timedelta(seconds=durationInSeconds)))
+    print('-'*20+' Doing a Dry run for Treshold' + '-'*20)
     totalError = []
-    count = 0
     prev = None
     # analyzes every frame at 2s.
     for fno in range(0, totalNoFrames, fps*5):
@@ -57,7 +56,7 @@ def testRun(vidcap, frames_folder, success, image):
     # 1991.726805678645
     totalError = np.array(totalError)
     treshold = 2 * np.std(totalError)
-    print('Using Predicted Treshold:', treshold)
+    print('Using Predicted Treshold:'+str(treshold))
     print('-----End of Testing----')
     return treshold
 
@@ -68,7 +67,7 @@ def analyzeFrame(image, slideNo, threshold, frames_folder, timestamp, prev=None)
             slideNo += 1
             # save frame as JPEG file
             cv2.imwrite(
-                "%s/frame%d_timestamp-%s.jpg" % (frames_folder, slideNo, timestamp.replace(':', '-')), prev)
+                "%s/frame%d_timestamp-%s.jpg" % (frames_folder, slideNo, timestamp.replace(':', ';')), prev)
 
     return image, slideNo
 
@@ -91,12 +90,11 @@ def grabFrames(vidcap, frames_folder, success, image, threshold=400):
             loop.update(fps*factor)
             prev, t = analyzeFrame(image, t, threshold, frames_folder, str(
                 datetime.timedelta(seconds=fno//fps)), prev)
-            s = mse(image, prev)
         prev = image
 
     t += 1
     cv2.imwrite(
-        "%s/frame%d_timestamp-%s.jpg" % (frames_folder, t, str(datetime.timedelta(seconds=count//fps).replace(':', '-'))), prev)
+        "%s/frame%d_timestamp-%s.jpg" % (frames_folder, t, (str(datetime.timedelta(seconds=count//fps)).replace(':', ';'))), prev)
 
     # new approach
     # total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -127,8 +125,9 @@ def main():
     frames_folder = video_file_path[:-4] + '_frames'
     if not os.path.exists(frames_folder):
         os.makedirs(frames_folder)
-    treshold = testRun(cv2.VideoCapture(video_file_path),
-                       frames_folder, success, image)
+    # hardcode the treshold if you feel like the predicted treshold isnt working properly.
+    treshold = predictTreshold(cv2.VideoCapture(video_file_path),
+                               frames_folder, success, image)
     grabFrames(cv2.VideoCapture(video_file_path),
                frames_folder, success, image, treshold)
     print('Conversion Completed')

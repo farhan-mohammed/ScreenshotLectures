@@ -1,3 +1,4 @@
-numpy==1.16.6
+numpy==1.18.5
 opencv-python==4.2.0.32
 tqdm==4.48.2
+img2pdf==0.4.0
