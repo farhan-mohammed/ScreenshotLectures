@@ -68,7 +68,7 @@ def analyzeFrame(image, slideNo, threshold, frames_folder, timestamp, prev=None)
             slideNo += 1
             # save frame as JPEG file
             cv2.imwrite(
-                "%s/frame%d_timestamp-%s.jpg" % (frames_folder, slideNo, timestamp), prev)
+                "%s/frame%d_timestamp-%s.jpg" % (frames_folder, slideNo, timestamp.replace(':', '-')), prev)
 
     return image, slideNo
 
@@ -96,7 +96,7 @@ def grabFrames(vidcap, frames_folder, success, image, threshold=400):
 
     t += 1
     cv2.imwrite(
-        "%s/frame%d_timestamp-%s.jpg" % (frames_folder, t, str(datetime.timedelta(seconds=count//fps))), prev)
+        "%s/frame%d_timestamp-%s.jpg" % (frames_folder, t, str(datetime.timedelta(seconds=count//fps).replace(':', '-'))), prev)
 
     # new approach
     # total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
